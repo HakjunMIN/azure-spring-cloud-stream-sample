@@ -1,0 +1,30 @@
+spring:
+  cloud:
+    azure:
+      servicebus:
+        connection-string: ${CONN_STRING:default}
+      retry:
+        timeout: 5
+        max-attempts: 3
+        backoff:
+          delay: 10
+          multiplier: 2
+    stream:
+      function:
+        definition: consume;supply
+      bindings:
+        consume-in-0:
+          destination: ${TOPIC:topic}
+          group: ${SUBSCRIPTION:sub}
+        supply-out-0:
+          destination: ${TOPIC:topic}
+          group: ${SUBSCRIPTION:sub}
+      servicebus:
+        topic:
+          bindings:
+            consume-in-0:
+              consumer:
+                checkpoint-mode: MANUAL
+      poller:
+        fixed-delay: 1000
+        initial-delay: 0
