@@ -1,4 +1,5 @@
 spring:
+  profiles: supplier
   cloud:
     azure:
       servicebus:
@@ -11,12 +12,32 @@ spring:
           multiplier: 2
     stream:
       function:
-        definition: consume;supply
+        definition: supply
       bindings:
-        consume-in-0:
+        supply-out-0:
           destination: ${TOPIC:topic}
           group: ${SUBSCRIPTION:sub}
-        supply-out-0:
+server:
+  port: 8080          
+
+---  
+spring:
+  profiles: consumer
+  cloud:
+    azure:
+      servicebus:
+        connection-string: ${CONN_STRING:default}
+      retry:
+        timeout: 5
+        max-attempts: 3
+        backoff:
+          delay: 10
+          multiplier: 2
+    stream:
+      function:
+        definition: consume
+      bindings:
+        consume-in-0:
           destination: ${TOPIC:topic}
           group: ${SUBSCRIPTION:sub}
       servicebus:
@@ -28,3 +49,5 @@ spring:
       poller:
         fixed-delay: 1000
         initial-delay: 0
+server:
+  port: 8081

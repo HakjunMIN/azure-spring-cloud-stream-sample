@@ -22,23 +22,45 @@ export TOPIC=topic
 export SUBSCRIPTION=sub
 ```
 
-4. 스프링 boot실행
+4. 메시지 생산자용 Spring Boot실행
 
 ```shell
 mvn spring-boot:run
+
+mvn spring-boot:run -Dspring-boot.run.profiles=supplier
+
 ```
 
-5. 메시지 발행
+5. 메시지 소비자용 Spring Boot실행
+
+```shell
+mvn spring-boot:run
+
+mvn spring-boot:run -Dspring-boot.run.profiles=consumer
+
+```
+> 용이한 로그 확인을 위해 별도의 창에서 실행
+
+6. 메시지 발행
 
 ```shell
 curl -X POST http://localhost:8080/messages -d '{"message":"hello", "name": "John"}' -H 'content-type: application/json'
 ```
 
-6. 메시지 수신 확인
-로그와 같이 메시지 수신 항목이 나오는지 확인
+7. 메시지 생산 로그 확인 확인 
+`-Dspring-boot.run.profiles=supplier` 로 구동한 Spring Boot의 로그에 아래와 같이 나오는지 확인
 
 ```
- ... New message received: '{"message":"hello","name":"John"}'
+...
+Manually sending message GenericMessage [payload={"message":"hello","name":"John"}, headers={id=52c5833c-7a4b-a176-f3df-b40cda178e83, timestamp=1643182645367}]
+```
+
+8. 메시지 소비 로그 확인
+`-Dspring-boot.run.profiles=consumer` 로 구동한 Spring Boot의 로그에 아래와 같이 나오는지 확인
+
+```
+...
+New message received: '{"message":"hello","name":"Joh69eeee99"}'
 ```
 
 ### 메시지 생산 부분
@@ -47,7 +69,9 @@ curl -X POST http://localhost:8080/messages -d '{"message":"hello", "name": "Joh
 
 ```Java
 public class PayloadVO {
+    @JsonProperty
     private String message;
+    @JsonProperty
     private String name;
 }
 ```
@@ -92,7 +116,9 @@ VO를 `json`으로 직렬화하여 메시지 생산
 public Consumer<Message<String>> consume() { }
 ```
 
-#### Retry Configuration
+#### 서비스 단절을 대비한 Retry설정
+
+메시지 생산 시 Azure Service Bus와의 단절을 대비하기 위한 Retry 설정 권고
 
 ```yaml
 spring:
@@ -105,6 +131,15 @@ spring:
           delay: 10
           multiplier: 2
 ```
+> 메시지 생산, 소비 부분에 각각 넣을 수 있으며 메시지의 갯수, 1건당 용량, Java Heap 사이즈 등을 고려하여 `max-attempts`, `backoff.delay`등을 설정
 
 다른설정은 하기 링크 참고
 [Link](https://microsoft.github.io/spring-cloud-azure/current/reference/html/index.html#spring-cloud-stream-binder-for-azure-service-bus)
+
+### 참고
+
+* Microsoft 공식문서: https://docs.microsoft.com/ko-kr/azure/developer/java/spring-framework/configure-spring-cloud-stream-binder-java-app-with-service-bus
+
+* Spring Cloud Stream binder for Azure Servic Bus: https://github.com/microsoft/spring-cloud-azure/blob/4.0.0-beta.3/docs/src/main/asciidoc/spring-cloud-stream-support.adoc#spring-cloud-stream-binder-for-azure-service-bus
+ 
+* 샘플코드: https://github.com/Azure-Samples/azure-spring-boot-samples/tree/main/servicebus/azure-spring-cloud-stream-binder-servicebus-topic/servicebus-topic-binder
