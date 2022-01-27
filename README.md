@@ -1,5 +1,6 @@
 # Spring Cloud Stream을 이용하여 Azure Service Bus Topic사용 샘플
 
+
 페이로드 VO를 직렬화 하여 메시지를 생산하고 소비할 곳에서 Bean등록만으로 메시지 소비
 
 ## Quick Start
