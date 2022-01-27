@@ -6,11 +6,12 @@
 ## Quick Start
 
 1. Azure Service Bus Setup
-<https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal>
+
+* Portal을 이용한 Azure Service Bus 생성: https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal
 
 > 단, topic을 사용하려면 Basic SKU 이상을 사용해야 함.
 
-2. 커넥션 스트링 설정
+1. 커넥션 스트링 설정
 
 ```shell
 export CONN_STRING="Endpoint=....."
@@ -26,8 +27,6 @@ export SUBSCRIPTION=sub
 4. 메시지 생산자용 Spring Boot실행
 
 ```shell
-mvn spring-boot:run
-
 mvn spring-boot:run -Dspring-boot.run.profiles=supplier
 
 ```
@@ -35,8 +34,6 @@ mvn spring-boot:run -Dspring-boot.run.profiles=supplier
 5. 메시지 소비자용 Spring Boot실행
 
 ```shell
-mvn spring-boot:run
-
 mvn spring-boot:run -Dspring-boot.run.profiles=consumer
 
 ```
